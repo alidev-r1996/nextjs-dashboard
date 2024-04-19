@@ -36,7 +36,7 @@ export type State = {
 
 export async function createInvoice(prevState: State, formData: FormData) {
 
-  const validatedFields = CreateInvoice.safeParse({
+  const validatedFields : {success?:boolean, error?:any} = CreateInvoice.safeParse({
     customerId: formData.get('customerId'),
     amount: formData.get('amount'),
     status: formData.get('status'),
@@ -44,6 +44,7 @@ export async function createInvoice(prevState: State, formData: FormData) {
  
   // If form validation fails, return errors early. Otherwise, continue.
   if (!validatedFields.success) {
+    console.log(validatedFields)
     return {
       errors: validatedFields.error.flatten().fieldErrors,
       message: 'Missing Fields. Failed to Create Invoice.',
@@ -82,7 +83,7 @@ export async function updateInvoice(
   prevState: State,
   formData: FormData,
 ) {
-  const validatedFields = UpdateInvoice.safeParse({
+  const validatedFields: {success?:boolean, error?:any} = UpdateInvoice.safeParse({
     customerId: formData.get('customerId'),
     amount: formData.get('amount'),
     status: formData.get('status'),
@@ -94,8 +95,13 @@ export async function updateInvoice(
       message: 'Missing Fields. Failed to Update Invoice.',
     };
   }
+
+  const { customerId, amount, status } = CreateInvoice.parse({
+    customerId: formData.get('customerId'),
+    amount: formData.get('amount'),
+    status: formData.get('status'),
+  });
  
-  const { customerId, amount, status } = validatedFields.data;
   const amountInCents = amount * 100;
  
   try {
